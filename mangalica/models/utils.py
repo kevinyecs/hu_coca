@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 from typing import Optional
 
 
@@ -86,3 +87,17 @@ class PrepareForNLPTrainer(nn.Module):
                 'logits': logits,
                 'loss': self.compute_loss(logits.float(), input_ids)
             }
+
+
+'''
+Apply Embedding to Latents before passing them into the Multimodal Network
+'''
+
+class EmbedToLatents(nn.Module):
+    def __init__(self, dim, dim_latents):
+        super().__init__()
+        self.to_latents = nn.Linear(dim, dim_latents, bias=False)
+
+    def forward(self, x):
+        latents = self.to_latents(x)
+        return F.normalize(latents, dim=-1)
