@@ -1,4 +1,4 @@
-# MangaliCa - Hungarian CoCa - PyTorch⚡
+# MangaliCa - Hungarian CoCa Model - PyTorch⚡
 
 Welcome to the Hungarian CoCa Model repository! This project aims to implement and explore the Hungarian CoCa (Contrastive Captioning) model, a novel approach to image captioning and understanding.
 
