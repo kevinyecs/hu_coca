@@ -248,6 +248,37 @@ class GQA(nn.Module):
 
         return self.o_proj(o)
 
+class XAttn(nn.Module):
+    def __init__(self,
+                 dim: int,
+                 c_dim: int,
+                 out_dim: int,
+                 n_heads: int = 8,
+                 head_dim: int = 64):
+        super().__init__()
+        self.n_heads = n_heads
+        self.head_dim = head_dim
+
+        self.q_proj = nn.Linear(dim, head_dim * n_heads, bias = False)
+        self.k_proj = nn.Linear(c_dim, head_dim * n_heads, bias = False)
+        self.v_proj = nn.Linear(c_dim, head_dim * n_heads, bias = False)
+        self.o_proj = nn.Linear(head_dim * n_heads, out_dim, bias = False)
+
+    def forward(self, x, c):
+        q, k, v = self.q_proj(x), self.k_proj(c), self.v_proj(c)
+
+        q = rearrange(q, 'b n (h d) -> b h n d', h = self.n_heads)
+        k = rearrange(k, 'b n (h d) -> b h n d', h = self.n_heads)
+        v = rearrange(v, 'b n (h d) -> b h n d', h = self.n_heads)
+
+        scores = einsum(q, k, 'b h n d, b h m d -> b h n m')
+        attention = F.softmax(scores / math.sqrt(self.head_dim), dim = -1)
+
+        o = einsum(attention, v, 'b h n m, b h m d -> b h n d')
+        o = rearrange(o, 'b h n d -> b n (h d)')
+
+        return self.o_proj(o)
+
 class SwiGLU(nn.Module):
     """
     Swish Gated Linear Unit (SwiGLU)
@@ -301,6 +332,53 @@ class LlamaBlock(nn.Module):
 
         x_norm = self.ffn_norm(x)
         x = self.ffn(x_norm) + x
+
+        return x
+
+class MultimodalLlamaBlock(nn.Module):
+    def __init__(self, config: LlamaConfig):
+        super().__init__()
+        self.dim = config.d_model
+
+        self.attn = GQA(config)
+        self.ffn = SwiGLU(
+            dim = config.d_model,
+            exp_factor = config.exp_factor
+        )
+
+        self.xattn = XAttn(
+            dim = config.d_model,
+            c_dim = config.d_model,
+            out_dim = config.d_model
+        )
+        self.ffn2 = SwiGLU(
+            dim = config.d_model,
+            exp_factor = config.exp_factor
+        )
+
+        self.attn_norm = RMSNorm(config.d_model, eps = config.norm_eps)
+        self.ffn_norm = RMSNorm(config.d_model, eps = config.norm_eps)
+
+        self.xattn_norm = RMSNorm(config.d_model, eps = config.norm_eps)
+        self.ffn2_norm = RMSNorm(config.d_model, eps = config.norm_eps)
+
+    def forward(self,
+                x: torch.Tensor,
+                c: torch.Tensor,
+                attn_mask: Optional[torch.Tensor],
+                rotary_embs: tuple[torch.Tensor, torch.Tensor]):
+
+        x_norm = self.attn_norm(x)
+        x = self.attn(x_norm, attn_mask, rotary_embs) + x
+
+        x_norm = self.ffn_norm(x)
+        x = self.ffn(x_norm) + x
+
+        x_norm = self.xattn_norm(x)
+        x = self.xattn(x, c) + x
+
+        x_norm = self.ffn2_norm(x)
+        x = self.ffn2(x_norm) + x
 
         return x
 
