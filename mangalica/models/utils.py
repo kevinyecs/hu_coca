@@ -3,8 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from typing import Optional
 
-
-class PrepareForImageTrainer(nn.Module):
+class PrepareVITForTrainer(nn.Module):
     def __init__(self, model):
         super().__init__()
         self.model = model
@@ -40,11 +39,8 @@ class PrepareForImageTrainer(nn.Module):
             'logits': logits,
             'loss': self.compute_loss(logits.float(), labels)
         }
-    
 
-
-
-class PrepareForNLPTrainer(nn.Module):
+class PrepareLlamaForTrainer(nn.Module):
     """
     To make the model compatible with HuggingFace's Trainer the model should
     produce a dictionary containing the 'logits' and 'loss'.
