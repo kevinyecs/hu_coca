@@ -31,3 +31,14 @@ class MangaliCa(nn.Module):
         self.img_encoder = img_encoder
         self.unimodal_decoder = unimodal_decoder
         self.multimodal_decoder = multimodal_decoder
+
+
+    def forward(self,
+        text,
+        images=None,
+        image_tokens=None,
+        labels=None,
+        return_loss=False,
+        return_embeddings=False):
+        pass
+

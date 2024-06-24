@@ -138,15 +138,11 @@ class PrepareForCoCaTrainer(nn.Module):
     def forward(self,
             logits: torch.Tensor,
             labels: torch.Tensor,
+            text_latents: torch.Tensor,
+            image_latents: torch.Tensor
             ):
+        return self.compute_loss(logits, labels, text_latents, image_latents)
 
-            llm_logits = self.language_model(input_ids)
-            img_logits = self.image_model(pixel_values)
-            return {
-                    'llm_logits': llm_logits,
-                    'logits': logits,
-                    'loss': 
-                }
 
 '''
 Apply Embedding to Latents before passing them into the Multimodal Network
