@@ -18,8 +18,7 @@ class ViTConfig():
                  ffn_dim : int = 3072,
                  num_channels : int = 3,
                  attn_dropout : float = 0.0,
-                 emb_dropout : float = 0.0,
-                 ):
+                 emb_dropout : float = 0.0):
 
         self.emb_dim = emb_dim
         self.num_labels = num_labels
