@@ -249,6 +249,10 @@ class GQA(nn.Module):
         return self.o_proj(o)
 
 class XAttn(nn.Module):
+    """
+    Missing Description
+    """
+    
     def __init__(self,
                  dim: int,
                  c_dim: int,
@@ -309,6 +313,10 @@ class SwiGLU(nn.Module):
         return self.out_proj(self.act(u) * v)
 
 class LlamaBlock(nn.Module):
+    """
+    Missing Description
+    """
+    
     def __init__(self, config: LlamaConfig):
         super().__init__()
         self.dim = config.d_model
@@ -336,6 +344,10 @@ class LlamaBlock(nn.Module):
         return x
 
 class MultimodalLlamaBlock(nn.Module):
+    """
+    Missing Description
+    """
+    
     def __init__(self, config: LlamaConfig):
         super().__init__()
         self.dim = config.d_model
