@@ -8,37 +8,40 @@ class MangaliCaConfig():
              image_dim: int = 768,
              num_img_query: int = 256,
              caption_loss_weight: int = 1.0,
-             contrastive_loss_weight: int = 1.0,
-             temperature: float = 0.07
-             ):
+             contrastive_loss_weight: int = 1.0):
 
         self.text_dim = text_dim
         self.img_dim = image_dim
         self.num_img_query = num_img_query
         self.caption_loss_weight = caption_loss_weight
         self.contrastive_loss_weight = contrastive_loss_weight
-        self.temperature = temperature
 
 class MangaliCa(nn.Module):
+    """
+    MangaliCa (Mangalica CoCa)
+
+    Detailed Description
+    """
+    
     def __init__(self,
                  config: MangaliCaConfig,
                  img_encoder = None,
                  unimodal_decoder = None,
-                 multimodal_decoder = None,
-                 ):
+                 multimodal_decoder = None):
         self.model_config = config
 
         self.img_encoder = img_encoder
         self.unimodal_decoder = unimodal_decoder
         self.multimodal_decoder = multimodal_decoder
 
+        ## Needs an import and initialization
+        self.attn_pooling = XAttn(...)
 
     def forward(self,
-        text,
-        images=None,
-        image_tokens=None,
-        labels=None,
-        return_loss=False,
-        return_embeddings=False):
-        pass
+                pixel_values: torch.Tensor,
+                input_ids: torch.Tensor):
+        device = pixel_values.device
 
+        img_feature = self.img_encoder(pixel_values)
+        
+        
