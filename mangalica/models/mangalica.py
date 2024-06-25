@@ -37,11 +37,16 @@ class MangaliCa(nn.Module):
         ## Needs an import and initialization
         self.attn_pooling = XAttn(...)
 
+        ## (captioning embeddings, contrastive embeddings)
+        self.img_query = nn.Parameter(torch.randn(num_img_query + 1, dim))
+
     def forward(self,
                 pixel_values: torch.Tensor,
                 input_ids: torch.Tensor):
         device = pixel_values.device
 
         img_feature = self.img_encoder(pixel_values)
+        cap_feature, con_feature = self.attn_pooling(img_feature, self.img_query).split([num_img_query, 1])
+
         
         
