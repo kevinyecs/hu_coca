@@ -21,6 +21,9 @@ class MangaliCa(nn.Module):
     MangaliCa (Mangalica CoCa)
 
     Detailed Description
+
+    References:
+        https://arxiv.org/pdf/2205.01917 (CoCa)
     """
     
     def __init__(self,
